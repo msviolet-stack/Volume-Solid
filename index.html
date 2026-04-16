@@ -1,267 +1,790 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Volume Explorer</title>
-
-<style>
-body {
-  margin:0;
-  font-family:Arial;
-  background:#eef3f8;
-}
-
-header {
-  padding:12px 20px;
-  background:white;
-  border-bottom:1px solid #ddd;
-}
-
-h1 { margin:0; font-size:22px; }
-
-.viewer-note{
-  position:absolute;
-  top:12px;
-  left:12px;
-  background:white;
-  padding:8px 14px;
-  border-radius:10px;
-  font-size:13px;
-  white-space:nowrap;
-}
-
-canvas { width:100%; height:100%; display:block; }
-.container { display:flex; }
-.left { flex:3; height:600px; position:relative; }
-.right { flex:2; padding:20px; background:white; }
-
-button { padding:8px 12px; margin:5px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Volume Explorer</title>
+  <style>
+    :root{
+      --bg:#eef3f8;
+      --card:#ffffff;
+      --border:#cfd8e3;
+      --text:#1f2937;
+      --muted:#64748b;
+      --primary:#2f66e3;
+      --primary-dark:#1f4fc4;
+      --shadow:0 12px 30px rgba(15,23,42,0.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#eef3f8 0%,#edf4f2 100%);
+      color:var(--text);
+    }
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:rgba(255,255,255,0.9);
+      backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--border);
+    }
+    .header-inner{
+      max-width:1240px;
+      margin:0 auto;
+      padding:14px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .brand-icon{
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      background:linear-gradient(135deg,#4d85ff,#2758d9);
+      display:grid;
+      place-items:center;
+      color:white;
+      font-size:22px;
+      box-shadow:var(--shadow);
+    }
+    .brand h1{
+      margin:0;
+      font-size:24px;
+      line-height:1.1;
+    }
+    .brand p{
+      margin:2px 0 0;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .question-nav{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .nav-btn{
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#fff;
+      cursor:pointer;
+      font-weight:700;
+      color:var(--text);
+    }
+    .nav-btn.active{
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:white;
+      border-color:transparent;
+    }
+    main{
+      max-width:1240px;
+      margin:0 auto;
+      padding:26px 20px;
+    }
+    .layout{
+      display:grid;
+      grid-template-columns:3fr 2fr;
+      gap:20px;
+    }
+    .panel{
+      background:rgba(255,255,255,0.82);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      overflow:hidden;
+      box-shadow:var(--shadow);
+    }
+    .viewer-wrap{
+      position:relative;
+      height:580px;
+      background:linear-gradient(180deg,#f7fbff 0%,#edf4ff 100%);
+    }
+    #scene{
+      width:100%;
+      height:100%;
+      display:block;
+      cursor:grab;
+    }
+    #scene:active{
+      cursor:grabbing;
+    }
+    .viewer-note{
+      position:absolute;
+      top:14px;
+      left:14px;
+      z-index:2;
+      background:rgba(255,255,255,0.88);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:10px 16px;
+      font-size:13px;
+      color:var(--muted);
+      box-shadow:0 8px 20px rgba(15,23,42,0.06);
+      width:max-content;
+      max-width:none;
+      white-space:nowrap;
+      line-height:1.2;
+    }
+    .legend{
+      padding:16px 18px 18px;
+      border-top:1px solid var(--border);
+      background:rgba(255,255,255,0.72);
+    }
+    .legend h3{
+      margin:0 0 12px;
+      font-size:16px;
+    }
+    .legend-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+    .legend-item{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .swatch{
+      width:20px;
+      height:20px;
+      border-radius:7px;
+      border:1px solid rgba(0,0,0,0.08);
+      flex-shrink:0;
+    }
+    .card{
+      padding:24px;
+    }
+    .pill{
+      display:inline-block;
+      padding:7px 12px;
+      border-radius:999px;
+      background:#e8efff;
+      color:#2451cf;
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:14px;
+    }
+    .question-title{
+      margin:0 0 12px;
+      font-size:24px;
+      line-height:1.35;
+      font-weight:700;
+    }
+    .question-text{
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.7;
+      margin-bottom:18px;
+      min-height:110px;
+    }
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-bottom:20px;
+    }
+    .stat{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+    }
+    .stat-label{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .stat-value{
+      font-size:30px;
+      font-weight:800;
+      color:#0f274d;
+      min-height:38px;
+      word-break:break-word;
+    }
+    .stat-actions{
+      margin-top:10px;
+    }
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:8px;
+      margin-bottom:14px;
+    }
+    .action{
+      border:none;
+      border-radius:16px;
+      padding:13px 18px;
+      font-size:15px;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .secondary{
+      background:#fff;
+      border:1px solid var(--border);
+      color:var(--text);
+    }
+    .primary{
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:#fff;
+      box-shadow:0 10px 20px rgba(47,102,227,0.25);
+    }
+    .action:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+    .small-btn{
+      padding:10px 14px;
+      font-size:14px;
+      border-radius:14px;
+    }
+    .small-note{
+      min-height:0;
+      margin:0;
+      padding:0;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .footer-credit{
+      margin-top:14px;
+      font-size:12px;
+      color:#94a3b8;
+    }
+    .hide{
+      display:none !important;
+    }
+    @media (max-width: 980px){
+      .layout{ grid-template-columns:1fr; }
+      .viewer-wrap{ height:460px; }
+      .viewer-note{
+        white-space:normal;
+        width:auto;
+        max-width:calc(100% - 28px);
+      }
+    }
+    @media (max-width: 640px){
+      .stats, .legend-grid{ grid-template-columns:1fr; }
+    }
+  </style>
 </head>
-
 <body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">◼</div>
+        <div>
+          <h1>Volume Explorer</h1>
+          <p>Interactive 3D Volume &amp; Surface Area</p>
+        </div>
+      </div>
+      <div class="question-nav" id="questionNav"></div>
+    </div>
+  </header>
 
-<header>
-<h1>Volume Explorer</h1>
-</header>
+  <main>
+    <div class="layout">
+      <div class="panel">
+        <div class="viewer-wrap">
+          <canvas id="scene"></canvas>
+          <div class="viewer-note" id="viewerNote">
+            <strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.
+          </div>
+        </div>
 
-<div class="container">
-<div class="left">
-<canvas id="scene"></canvas>
-<div class="viewer-note">
-<b>Drag to rotate.</b> Scroll to zoom. Click a cube to detach / reattach.
-</div>
-</div>
+        <div class="legend" id="legendBox">
+          <h3>Face Legend</h3>
+          <div class="legend-grid">
+            <div class="legend-item">
+              <span class="swatch" id="paintedSwatch" style="background:#4d96ff"></span>
+              <span id="legendLabel1">Painted outer surfaces</span>
+            </div>
+            <div class="legend-item">
+              <span class="swatch" id="secondSwatch" style="background:#ffffff"></span>
+              <span id="legendLabel2">Inner unpainted surfaces</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-<div class="right">
-<h2 id="title"></h2>
-<p id="question"></p>
-<button onclick="prev()">Prev</button>
-<button onclick="next()">Next</button>
-</div>
-</div>
+      <div class="panel">
+        <div class="card">
+          <div class="pill" id="pillLabel">Simulator 1</div>
+          <h2 class="question-title" id="questionTitle"></h2>
+          <div class="question-text" id="questionText"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+          <div class="stats" id="statsBox">
+            <div class="stat">
+              <div class="stat-label" id="statLabel1">Total cubes</div>
+              <div class="stat-value" id="totalCubes">?</div>
+              <div class="stat-actions">
+                <button class="action secondary small-btn" id="revealBtn">Reveal</button>
+              </div>
+            </div>
 
-<script>
+            <div class="stat">
+              <div class="stat-label" id="statLabel2">Total painted surface</div>
+              <div class="stat-value" id="paintedFaces">?</div>
+              <div class="stat-actions">
+                <button class="action primary small-btn" id="resetBtn">Reset</button>
+              </div>
+            </div>
+          </div>
 
-const INTERNAL_COLOR = 0xffffff;
+          <div class="controls" id="controlsBox">
+            <button class="action secondary" id="prevBtn">← Previous</button>
+            <button class="action secondary" id="nextBtn">Next →</button>
+          </div>
 
-const COLORS = [
-  0x4d96ff,
-  0xff8fab,
-  0x51cf66,
-  0xffb347,
-  0xa78bfa
-];
+          <div class="small-note" id="smallNote"></div>
 
-function generate(w,h,d){
-  const arr=[];
-  for(let x=0;x<w;x++)
-  for(let y=0;y<h;y++)
-  for(let z=0;z<d;z++)
-    arr.push({x,y,z});
-  return arr;
-}
+          <div class="footer-credit">Developed for GitHub Pages</div>
+        </div>
+      </div>
+    </div>
+  </main>
 
-const questions=[
-{
-id:1,
-title:"P6 Worksheet 11A Q9",
-text:"Three cubes are glued together...",
-cubes:[
-{x:0,y:0,z:0},
-{x:0,y:0,z:1},
-{x:1,y:0,z:1}
-]
-},
-{
-id:2,
-title:"PSLE Practice Paper",
-text:"Hassan had a rectangular block...",
-cubes:generate(6,9,6)
-}
-];
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-let current=1;
-let detached=[];
+  <script>
+    const INTERNAL_COLOR = 0xffffff;
 
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0xf4f8ff);
+    const QUESTION_PAINT_COLORS = [
+      0x4d96ff,
+      0xff8fab,
+      0x51cf66,
+      0xffb347,
+      0xa78bfa
+    ];
 
-const camera=new THREE.PerspectiveCamera(45,1,0.1,1000);
-camera.position.set(10,8,10);
-
-const renderer=new THREE.WebGLRenderer({canvas:sceneCanvas,antialias:true});
-const canvas=document.getElementById("scene");
-renderer.setSize(canvas.clientWidth,canvas.clientHeight);
-
-const controls=new THREE.OrbitControls(camera,renderer.domElement);
-
-scene.add(new THREE.AmbientLight(0xffffff,1));
-
-const light=new THREE.DirectionalLight(0xffffff,1);
-light.position.set(20,30,20);
-scene.add(light);
-
-const group=new THREE.Group();
-scene.add(group);
-
-function getMaterials(c,set,color){
-
-  const q=questions[current-1];
-
-  const xs=q.cubes.map(c=>c.x);
-  const ys=q.cubes.map(c=>c.y);
-  const zs=q.cubes.map(c=>c.z);
-
-  const minX=Math.min(...xs);
-  const maxX=Math.max(...xs);
-  const minY=Math.min(...ys);
-  const maxY=Math.max(...ys);
-  const minZ=Math.min(...zs);
-  const maxZ=Math.max(...zs);
-
-  const has=(x,y,z)=>set.has(`${x},${y},${z}`);
-
-  const right = (c.x===maxX || !has(c.x+1,c.y,c.z)) ? color : INTERNAL_COLOR;
-  const left  = (c.x===minX || !has(c.x-1,c.y,c.z)) ? color : INTERNAL_COLOR;
-
-  // 🔥 FIX: TOP ALWAYS PINK FOR SIM 2
-  const top = (current===2 && c.y===maxY)
-    ? color
-    : ((c.y===maxY || !has(c.x,c.y+1,c.z)) ? color : INTERNAL_COLOR);
-
-  const bottom = (c.y===minY || !has(c.x,c.y-1,c.z)) ? color : INTERNAL_COLOR;
-  const front  = (c.z===maxZ || !has(c.x,c.y,c.z+1)) ? color : INTERNAL_COLOR;
-  const back   = (c.z===minZ || !has(c.x,c.y,c.z-1)) ? color : INTERNAL_COLOR;
-
-  return [
-    new THREE.MeshLambertMaterial({color:right}),
-    new THREE.MeshLambertMaterial({color:left}),
-    new THREE.MeshLambertMaterial({color:top}),
-    new THREE.MeshLambertMaterial({color:bottom}),
-    new THREE.MeshLambertMaterial({color:front}),
-    new THREE.MeshLambertMaterial({color:back})
-  ];
-}
-
-function build(preserve=true){
-
-  while(group.children.length){
-    const o=group.children[0];
-    group.remove(o);
-  }
-
-  const q=questions[current-1];
-  const color=COLORS[current-1];
-  const set=new Set(q.cubes.map(c=>`${c.x},${c.y},${c.z}`));
-
-  q.cubes.forEach((c,i)=>{
-
-    const geo=new THREE.BoxGeometry(1,1,1);
-    const mesh=new THREE.Mesh(geo,getMaterials(c,set,color));
-
-    let x=c.x, y=c.y, z=c.z;
-
-    if(detached.includes(i)){
-      x+=2; y+=2; z+=2;
+    function hexToCss(num) {
+      return "#" + num.toString(16).padStart(6, "0");
     }
 
-    mesh.position.set(x,y,z);
-    mesh.userData.index=i;
-
-    group.add(mesh);
-  });
-
-  if(!preserve){
-    camera.position.set(10,8,10);
-    controls.update();
-  }
-}
-
-function updateUI(){
-  const q=questions[current-1];
-  document.getElementById("title").innerText=q.title;
-  document.getElementById("question").innerText=q.text;
-}
-
-function next(){
-  if(current<questions.length){
-    current++;
-    detached=[];
-    build(false);
-    updateUI();
-  }
-}
-
-function prev(){
-  if(current>1){
-    current--;
-    detached=[];
-    build(false);
-    updateUI();
-  }
-}
-
-canvas.addEventListener("click",(e)=>{
-
-  const rect=canvas.getBoundingClientRect();
-  const mouse=new THREE.Vector2(
-    ((e.clientX-rect.left)/rect.width)*2-1,
-    -((e.clientY-rect.top)/rect.height)*2+1
-  );
-
-  const ray=new THREE.Raycaster();
-  ray.setFromCamera(mouse,camera);
-
-  const hits=ray.intersectObjects(group.children);
-
-  if(hits.length){
-    const idx=hits[0].object.userData.index;
-
-    if(detached.includes(idx)){
-      detached=detached.filter(i=>i!==idx);
-    } else {
-      detached.push(idx);
+    function generateRectangularPrism(w, h, d) {
+      const cubes = [];
+      for (let x = 0; x < w; x++) {
+        for (let y = 0; y < h; y++) {
+          for (let z = 0; z < d; z++) {
+            cubes.push({ x, y, z });
+          }
+        }
+      }
+      return cubes;
     }
 
-    build(true); // 🔥 KEEP ZOOM
-  }
-});
+    const questions = [
+      {
+        id: 1,
+        title: "P6 Worksheet 11A Q9",
+        textHtml: "Three cubes are glued together to form the solid below. All the faces of the solid are painted. The total surface area of the painted faces is 504 cm². Find the volume of one cube.",
+        cubes: [
+          { x: 0, y: 0, z: 0 },
+          { x: 0, y: 0, z: 1 },
+          { x: 1, y: 0, z: 1 }
+        ],
+        showStats: true,
+        showControls: true,
+        showLegend: true,
+        stat1Label: "Total cubes",
+        stat2Label: "Total painted surface",
+        note: ""
+      },
+      {
+        id: 2,
+        title: "PSLE Practice Paper",
+        textHtml: "Hassan had a rectangular block with a square base as shown. He painted all the faces of the block and then cut it into 1-cm cubes.<br><br>There were 68 cubes with exactly two of their faces painted. Find the volume of the block before it was cut.",
+        cubes: generateRectangularPrism(6, 9, 6),
+        showStats: false,
+        showControls: false,
+        showLegend: true,
+        stat1Label: "Total cubes",
+        stat2Label: "Total painted surface",
+        note: ""
+      },
+      {
+        id: 3,
+        title: "Explore a 3 × 2 × 1 cuboid.",
+        textHtml: "Observe the painted faces.",
+        cubes: generateRectangularPrism(3, 2, 1),
+        showStats: true,
+        showControls: true,
+        showLegend: true,
+        stat1Label: "Total cubes",
+        stat2Label: "Total painted surface",
+        note: ""
+      },
+      {
+        id: 4,
+        title: "Investigate a 3 × 2 × 2 cuboid.",
+        textHtml: "Rotate the solid to explore.",
+        cubes: generateRectangularPrism(3, 2, 2),
+        showStats: true,
+        showControls: true,
+        showLegend: true,
+        stat1Label: "Total cubes",
+        stat2Label: "Total painted surface",
+        note: ""
+      },
+      {
+        id: 5,
+        title: "Explore a 3 × 3 × 1 slab.",
+        textHtml: "Compare cubes and exposed faces.",
+        cubes: generateRectangularPrism(3, 3, 1),
+        showStats: true,
+        showControls: true,
+        showLegend: true,
+        stat1Label: "Total cubes",
+        stat2Label: "Total painted surface",
+        note: ""
+      }
+    ];
 
-function animate(){
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene,camera);
-}
+    function countTotalPaintedFaces(cubes) {
+      const cubeSet = new Set(cubes.map(c => `${c.x},${c.y},${c.z}`));
+      let total = 0;
+      for (const c of cubes) {
+        const neighbors = [
+          [c.x + 1, c.y, c.z],
+          [c.x - 1, c.y, c.z],
+          [c.x, c.y + 1, c.z],
+          [c.x, c.y - 1, c.z],
+          [c.x, c.y, c.z + 1],
+          [c.x, c.y, c.z - 1]
+        ];
+        for (const n of neighbors) {
+          if (!cubeSet.has(n.join(","))) total++;
+        }
+      }
+      return total;
+    }
 
-build(false);
-updateUI();
-animate();
+    let currentQId = 1;
+    let isRevealed = false;
+    let detachedIndices = [];
 
-</script>
+    const questionNav = document.getElementById("questionNav");
+    const pillLabel = document.getElementById("pillLabel");
+    const questionTitle = document.getElementById("questionTitle");
+    const questionText = document.getElementById("questionText");
+    const totalCubesEl = document.getElementById("totalCubes");
+    const paintedFacesEl = document.getElementById("paintedFaces");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const revealBtn = document.getElementById("revealBtn");
+    const canvas = document.getElementById("scene");
+    const paintedSwatch = document.getElementById("paintedSwatch");
+    const secondSwatch = document.getElementById("secondSwatch");
+    const legendLabel1 = document.getElementById("legendLabel1");
+    const legendLabel2 = document.getElementById("legendLabel2");
+    const viewerNote = document.getElementById("viewerNote");
+    const statLabel1 = document.getElementById("statLabel1");
+    const statLabel2 = document.getElementById("statLabel2");
+    const smallNote = document.getElementById("smallNote");
+    const statsBox = document.getElementById("statsBox");
+    const controlsBox = document.getElementById("controlsBox");
+    const legendBox = document.getElementById("legendBox");
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf4f8ff);
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    camera.position.set(8, 6, 8);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enablePan = false;
+    controls.minDistance = 4;
+    controls.maxDistance = 100;
+
+    const ambient = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(ambient);
+
+    const light1 = new THREE.DirectionalLight(0xffffff, 1);
+    light1.position.set(20, 30, 20);
+    scene.add(light1);
+
+    const light2 = new THREE.DirectionalLight(0xffffff, 0.45);
+    light2.position.set(-20, 15, -20);
+    scene.add(light2);
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    const grid = new THREE.GridHelper(80, 16, 0xc7d6ff, 0xdbe6ff);
+    grid.position.y = -8;
+    scene.add(grid);
+
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(90, 90),
+      new THREE.MeshBasicMaterial({
+        color: 0xf8fbff,
+        transparent: true,
+        opacity: 0.85,
+        side: THREE.DoubleSide
+      })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -8.1;
+    scene.add(floor);
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function getCurrentQuestion() {
+      return questions.find(q => q.id === currentQId);
+    }
+
+    function getCurrentPaintColor() {
+      return QUESTION_PAINT_COLORS[currentQId - 1] || 0x4d96ff;
+    }
+
+    function buildNav() {
+      questionNav.innerHTML = "";
+      questions.forEach(q => {
+        const btn = document.createElement("button");
+        btn.className = "nav-btn" + (q.id === currentQId ? " active" : "");
+        btn.textContent = q.id;
+        btn.onclick = () => selectQuestion(q.id);
+        questionNav.appendChild(btn);
+      });
+    }
+
+    function selectQuestion(id) {
+      currentQId = id;
+      isRevealed = false;
+      detachedIndices = [];
+      rebuildScene(false);
+      updateUI();
+    }
+
+    function getCubeMaterials(c, cubeSet, paintColor, bounds) {
+      const has = (x, y, z) => cubeSet.has(`${x},${y},${z}`);
+
+      const right  = (c.x === bounds.maxX || !has(c.x + 1, c.y, c.z)) ? paintColor : INTERNAL_COLOR;
+      const left   = (c.x === bounds.minX || !has(c.x - 1, c.y, c.z)) ? paintColor : INTERNAL_COLOR;
+      const top    = (c.y === bounds.maxY || !has(c.x, c.y + 1, c.z)) ? paintColor : INTERNAL_COLOR;
+      const bottom = (c.y === bounds.minY || !has(c.x, c.y - 1, c.z)) ? paintColor : INTERNAL_COLOR;
+      const front  = (c.z === bounds.maxZ || !has(c.x, c.y, c.z + 1)) ? paintColor : INTERNAL_COLOR;
+      const back   = (c.z === bounds.minZ || !has(c.x, c.y, c.z - 1)) ? paintColor : INTERNAL_COLOR;
+
+      return [
+        new THREE.MeshLambertMaterial({ color: right }),
+        new THREE.MeshLambertMaterial({ color: left }),
+        new THREE.MeshLambertMaterial({ color: top }),
+        new THREE.MeshLambertMaterial({ color: bottom }),
+        new THREE.MeshLambertMaterial({ color: front }),
+        new THREE.MeshLambertMaterial({ color: back })
+      ];
+    }
+
+    function clearGroup() {
+      while (group.children.length > 0) {
+        const obj = group.children[0];
+        group.remove(obj);
+
+        if (obj.geometry) obj.geometry.dispose();
+
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+          else obj.material.dispose();
+        }
+      }
+    }
+
+    function buildSmallCubes(question) {
+      const paintColor = getCurrentPaintColor();
+      const cubes = question.cubes;
+      const cubeSet = new Set(cubes.map(c => `${c.x},${c.y},${c.z}`));
+
+      const xs = cubes.map(c => c.x);
+      const ys = cubes.map(c => c.y);
+      const zs = cubes.map(c => c.z);
+
+      const bounds = {
+        minX: Math.min(...xs),
+        maxX: Math.max(...xs),
+        minY: Math.min(...ys),
+        maxY: Math.max(...ys),
+        minZ: Math.min(...zs),
+        maxZ: Math.max(...zs)
+      };
+
+      const centerX = (bounds.minX + bounds.maxX) / 2;
+      const centerY = (bounds.minY + bounds.maxY) / 2;
+      const centerZ = (bounds.minZ + bounds.maxZ) / 2;
+
+      const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+      const edgeGeometry = new THREE.EdgesGeometry(cubeGeometry);
+
+      cubes.forEach((c, index) => {
+        const mesh = new THREE.Mesh(
+          cubeGeometry,
+          getCubeMaterials(c, cubeSet, paintColor, bounds)
+        );
+
+        let x = (c.x - centerX) * 1.05;
+        let y = (c.y - centerY) * 1.05;
+        let z = (c.z - centerZ) * 1.05;
+
+        if (detachedIndices.includes(index)) {
+          const dir = new THREE.Vector3(x || 0.3, y + 0.4, z || 0.3).normalize();
+          x += dir.x * 2.0;
+          y += dir.y * 2.0 + 0.5;
+          z += dir.z * 2.0;
+        }
+
+        mesh.position.set(x, y, z);
+        mesh.userData.index = index;
+        mesh.userData.clickable = true;
+        group.add(mesh);
+
+        const edge = new THREE.LineSegments(
+          edgeGeometry,
+          new THREE.LineBasicMaterial({
+            color: 0x29466f,
+            transparent: true,
+            opacity: 0.4
+          })
+        );
+        edge.position.copy(mesh.position);
+        group.add(edge);
+      });
+    }
+
+    function rebuildScene(preserveView = true) {
+      clearGroup();
+      buildSmallCubes(getCurrentQuestion());
+      if (!preserveView) fitCamera();
+    }
+
+    function fitCamera() {
+      const box = new THREE.Box3().setFromObject(group);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+
+      const maxDim = Math.max(size.x, size.y, size.z, 3);
+      const dist = maxDim * 2.1;
+
+      camera.position.set(center.x + dist, center.y + dist * 0.65, center.z + dist);
+      controls.target.copy(center);
+      controls.update();
+    }
+
+    function updateUI() {
+      const q = getCurrentQuestion();
+      const paintColor = getCurrentPaintColor();
+
+      pillLabel.textContent = `Simulator ${q.id}`;
+      questionTitle.textContent = q.title;
+      questionText.innerHTML = q.textHtml;
+
+      q.showStats ? statsBox.classList.remove("hide") : statsBox.classList.add("hide");
+      q.showControls ? controlsBox.classList.remove("hide") : controlsBox.classList.add("hide");
+      q.showLegend ? legendBox.classList.remove("hide") : legendBox.classList.add("hide");
+
+      statLabel1.textContent = q.stat1Label || "Total cubes";
+      statLabel2.textContent = q.stat2Label || "Total painted surface";
+
+      totalCubesEl.textContent = isRevealed && q.showStats ? q.cubes.length : "?";
+      paintedFacesEl.textContent = isRevealed && q.showStats ? countTotalPaintedFaces(q.cubes) : "?";
+
+      prevBtn.disabled = currentQId === 1;
+      nextBtn.disabled = currentQId === questions.length;
+
+      paintedSwatch.style.background = hexToCss(paintColor);
+      secondSwatch.style.background = "#ffffff";
+      legendLabel1.textContent = "Painted outer surfaces";
+      legendLabel2.textContent = "Inner unpainted surfaces";
+      viewerNote.innerHTML = "<strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.";
+
+      smallNote.textContent = q.note || "";
+      buildNav();
+    }
+
+    function resizeRenderer() {
+      const rect = canvas.getBoundingClientRect();
+      renderer.setSize(rect.width, rect.height, false);
+      camera.aspect = rect.width / rect.height;
+      camera.updateProjectionMatrix();
+    }
+
+    function onCanvasClick(event) {
+      const q = getCurrentQuestion();
+
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const cubeMeshes = group.children.filter(obj => obj.type === "Mesh" && obj.userData.clickable);
+      const hits = raycaster.intersectObjects(cubeMeshes);
+
+      if (hits.length > 0) {
+        const idx = hits[0].object.userData.index;
+        if (detachedIndices.includes(idx)) {
+          detachedIndices = detachedIndices.filter(i => i !== idx);
+        } else {
+          detachedIndices.push(idx);
+        }
+        rebuildScene(true);
+      }
+    }
+
+    prevBtn.onclick = () => {
+      if (currentQId > 1) selectQuestion(currentQId - 1);
+    };
+
+    nextBtn.onclick = () => {
+      if (currentQId < questions.length) selectQuestion(currentQId + 1);
+    };
+
+    revealBtn.onclick = () => {
+      isRevealed = true;
+      updateUI();
+    };
+
+    resetBtn.onclick = () => {
+      isRevealed = false;
+      detachedIndices = [];
+      rebuildScene(false);
+      updateUI();
+    };
+
+    canvas.addEventListener("click", onCanvasClick);
+    window.addEventListener("resize", () => {
+      resizeRenderer();
+      renderer.render(scene, camera);
+    });
+
+    resizeRenderer();
+    rebuildScene(false);
+    updateUI();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
 </body>
 </html>

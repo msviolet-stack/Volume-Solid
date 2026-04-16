@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PSLE Practice Paper</title>
+  <title>Volume Explorer</title>
   <style>
     :root{
       --bg:#eef3f8;
@@ -286,7 +286,7 @@
       <div class="brand">
         <div class="brand-icon">◼</div>
         <div>
-          <h1>PSLE Practice Paper</h1>
+          <h1>Volume Explorer</h1>
           <p>Interactive 3D Volume &amp; Surface Area</p>
         </div>
       </div>
@@ -306,9 +306,15 @@
 
         <div class="legend" id="legendBox">
           <h3>Face Legend</h3>
-          <div class="legend-grid" id="legendGrid">
-            <div class="legend-item"><span class="swatch" id="paintedSwatch" style="background:#4d96ff"></span><span id="legendLabel1">Painted outer surfaces</span></div>
-            <div class="legend-item"><span class="swatch" id="secondSwatch" style="background:#ffffff"></span><span id="legendLabel2">Inner unpainted surfaces</span></div>
+          <div class="legend-grid">
+            <div class="legend-item">
+              <span class="swatch" id="paintedSwatch" style="background:#4d96ff"></span>
+              <span id="legendLabel1">Painted outer surfaces</span>
+            </div>
+            <div class="legend-item">
+              <span class="swatch" id="secondSwatch" style="background:#ffffff"></span>
+              <span id="legendLabel2">Inner unpainted surfaces</span>
+            </div>
           </div>
         </div>
       </div>
@@ -400,7 +406,7 @@
       },
       {
         id: 2,
-        title: "P6 Worksheet 11A",
+        title: "PSLE Practice Paper",
         textHtml: "Hassan had a rectangular block with a square base as shown. He painted all the faces of the block and then cut it into 1-cm cubes.<br><br>There were 68 cubes with exactly two of their faces painted. Find the volume of the block before it was cut.",
         type: "small-cubes",
         cubes: generateRectangularPrism(6, 9, 6),
@@ -577,13 +583,14 @@
 
     function getCubeMaterials(c, cubeSet, paintColor) {
       const has = (x, y, z) => cubeSet.has(`${x},${y},${z}`);
+      const isExposed = (x, y, z) => !has(x, y, z);
 
-      const right  = has(c.x + 1, c.y, c.z) ? INTERNAL_COLOR : paintColor;
-      const left   = has(c.x - 1, c.y, c.z) ? INTERNAL_COLOR : paintColor;
-      const top    = has(c.x, c.y + 1, c.z) ? INTERNAL_COLOR : paintColor;
-      const bottom = has(c.x, c.y - 1, c.z) ? INTERNAL_COLOR : paintColor;
-      const front  = has(c.x, c.y, c.z + 1) ? INTERNAL_COLOR : paintColor;
-      const back   = has(c.x, c.y, c.z - 1) ? INTERNAL_COLOR : paintColor;
+      const right  = isExposed(c.x + 1, c.y, c.z) ? paintColor : INTERNAL_COLOR;
+      const left   = isExposed(c.x - 1, c.y, c.z) ? paintColor : INTERNAL_COLOR;
+      const top    = isExposed(c.x, c.y + 1, c.z) ? paintColor : INTERNAL_COLOR;
+      const bottom = isExposed(c.x, c.y - 1, c.z) ? paintColor : INTERNAL_COLOR;
+      const front  = isExposed(c.x, c.y, c.z + 1) ? paintColor : INTERNAL_COLOR;
+      const back   = isExposed(c.x, c.y, c.z - 1) ? paintColor : INTERNAL_COLOR;
 
       return [
         new THREE.MeshLambertMaterial({ color: right }),

@@ -142,7 +142,7 @@
     }
     .legend-grid{
       display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
+      grid-template-columns:repeat(2, minmax(0,1fr));
       gap:12px;
     }
     .legend-item{
@@ -181,7 +181,7 @@
       font-size:15px;
       line-height:1.6;
       margin-bottom:18px;
-      min-height:48px;
+      min-height:72px;
     }
     .stats{
       display:grid;
@@ -280,12 +280,8 @@
         <div class="legend">
           <h3>Face Legend</h3>
           <div class="legend-grid">
-            <div class="legend-item"><span class="swatch" style="background:#ff6b6b"></span>Top face</div>
-            <div class="legend-item"><span class="swatch" style="background:#4dabf7"></span>Front face</div>
-            <div class="legend-item"><span class="swatch" style="background:#51cf66"></span>Right face</div>
-            <div class="legend-item"><span class="swatch" style="background:#ffd43b"></span>Left face</div>
-            <div class="legend-item"><span class="swatch" style="background:#845ef7"></span>Back face</div>
-            <div class="legend-item"><span class="swatch" style="background:#ffa94d"></span>Bottom face</div>
+            <div class="legend-item"><span class="swatch" id="paintedSwatch" style="background:#4d96ff"></span>Painted outer surfaces</div>
+            <div class="legend-item"><span class="swatch" style="background:#ffffff"></span>Inner unpainted surfaces</div>
           </div>
         </div>
       </div>
@@ -335,15 +331,24 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <script>
-    const FACE_COLORS = {
-      right: 0x51cf66,
-      left: 0xffd43b,
-      top: 0xff6b6b,
-      bottom: 0xffa94d,
-      front: 0x4dabf7,
-      back: 0x845ef7,
-      internal: 0x2f5fb0
-    };
+    const INTERNAL_COLOR = 0xffffff;
+
+    const QUESTION_PAINT_COLORS = [
+      0x4d96ff, // Q1 blue
+      0xff8fab, // Q2 pink
+      0x51cf66, // Q3 green
+      0xffb347, // Q4 orange
+      0xa78bfa, // Q5 purple
+      0x2dd4bf, // Q6 teal
+      0xf87171, // Q7 coral
+      0xfacc15, // Q8 yellow
+      0x60a5fa, // Q9 sky
+      0xf472b6  // Q10 rose
+    ];
+
+    function hexToCss(num) {
+      return "#" + num.toString(16).padStart(6, "0");
+    }
 
     function generateRectangularPrism(w, h, d) {
       const cubes = [];
@@ -360,14 +365,20 @@
     const questions = [
       {
         id: 1,
-        title: "Count the exposed faces of a 2 × 2 × 2 cube",
-        text: "Observe the solid carefully. Click on any small cube to detach it and inspect the inside.",
-        cubes: generateRectangularPrism(2, 2, 2)
+        title: "Three cubes are glued together to form the solid below.",
+        text: "All the faces of the solid are painted. The total surface area of the painted faces is 504 cm². Find the volume of one cube.",
+        // L-shape like your picture:
+        // front-left, back-left, back-right
+        cubes: [
+          { x: 0, y: 0, z: 0 },
+          { x: 0, y: 0, z: 1 },
+          { x: 1, y: 0, z: 1 }
+        ]
       },
       {
         id: 2,
         title: "Explore a 3 × 1 × 1 prism",
-        text: "This should look like 3 joined cubes, like your sample picture.",
+        text: "This solid is made of 3 cubes in a straight row. Observe the painted and unpainted faces.",
         cubes: generateRectangularPrism(3, 1, 1)
       },
       {
@@ -454,6 +465,7 @@
     const nextBtn = document.getElementById("nextBtn");
     const resetBtn = document.getElementById("resetBtn");
     const canvas = document.getElementById("scene");
+    const paintedSwatch = document.getElementById("paintedSwatch");
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -510,6 +522,10 @@
       return questions.find(q => q.id === currentQId);
     }
 
+    function getCurrentPaintColor() {
+      return QUESTION_PAINT_COLORS[currentQId - 1] || 0x4d96ff;
+    }
+
     function buildNav() {
       questionNav.innerHTML = "";
       questions.forEach(q => {
@@ -528,15 +544,15 @@
       updateUI();
     }
 
-    function getCubeMaterials(c, cubeSet) {
+    function getCubeMaterials(c, cubeSet, paintColor) {
       const has = (x, y, z) => cubeSet.has(`${x},${y},${z}`);
 
-      const right  = has(c.x + 1, c.y, c.z) ? FACE_COLORS.internal : FACE_COLORS.right;
-      const left   = has(c.x - 1, c.y, c.z) ? FACE_COLORS.internal : FACE_COLORS.left;
-      const top    = has(c.x, c.y + 1, c.z) ? FACE_COLORS.internal : FACE_COLORS.top;
-      const bottom = has(c.x, c.y - 1, c.z) ? FACE_COLORS.internal : FACE_COLORS.bottom;
-      const front  = has(c.x, c.y, c.z + 1) ? FACE_COLORS.internal : FACE_COLORS.front;
-      const back   = has(c.x, c.y, c.z - 1) ? FACE_COLORS.internal : FACE_COLORS.back;
+      const right  = has(c.x + 1, c.y, c.z) ? INTERNAL_COLOR : paintColor;
+      const left   = has(c.x - 1, c.y, c.z) ? INTERNAL_COLOR : paintColor;
+      const top    = has(c.x, c.y + 1, c.z) ? INTERNAL_COLOR : paintColor;
+      const bottom = has(c.x, c.y - 1, c.z) ? INTERNAL_COLOR : paintColor;
+      const front  = has(c.x, c.y, c.z + 1) ? INTERNAL_COLOR : paintColor;
+      const back   = has(c.x, c.y, c.z - 1) ? INTERNAL_COLOR : paintColor;
 
       return [
         new THREE.MeshLambertMaterial({ color: right }),
@@ -564,6 +580,7 @@
       clearGroup();
 
       const q = getCurrentQuestion();
+      const paintColor = getCurrentPaintColor();
       const cubes = q.cubes;
       const cubeSet = new Set(cubes.map(c => `${c.x},${c.y},${c.z}`));
 
@@ -579,7 +596,7 @@
       const centerZ = (Math.min(...zs) + Math.max(...zs)) / 2;
 
       cubes.forEach((c, index) => {
-        const mesh = new THREE.Mesh(cubeGeometry, getCubeMaterials(c, cubeSet));
+        const mesh = new THREE.Mesh(cubeGeometry, getCubeMaterials(c, cubeSet, paintColor));
 
         let x = (c.x - centerX) * 1.05;
         let y = (c.y - centerY) * 1.05;
@@ -598,7 +615,7 @@
 
         const edge = new THREE.LineSegments(
           edgeGeometry,
-          new THREE.LineBasicMaterial({ color: 0x29466f, transparent: true, opacity: 0.35 })
+          new THREE.LineBasicMaterial({ color: 0x29466f, transparent: true, opacity: 0.4 })
         );
         edge.position.copy(mesh.position);
         group.add(edge);
@@ -622,6 +639,8 @@
 
     function updateUI() {
       const q = getCurrentQuestion();
+      const paintColor = getCurrentPaintColor();
+
       pillLabel.textContent = `Question ${q.id}`;
       questionTitle.textContent = q.title;
       questionText.textContent = q.text;
@@ -631,6 +650,8 @@
       remainingCountEl.textContent = q.cubes.length - detachedIndices.length;
       prevBtn.disabled = currentQId === 1;
       nextBtn.disabled = currentQId === questions.length;
+      paintedSwatch.style.background = hexToCss(paintColor);
+
       buildNav();
     }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Volume Explorer</title>
+  <title>P6 Worksheet 11A Q9</title>
   <style>
     :root{
       --bg:#eef3f8;
@@ -269,7 +269,7 @@
       <div class="brand">
         <div class="brand-icon">◼</div>
         <div>
-          <h1>Volume Explorer</h1>
+          <h1>P6 Worksheet 11A Q9</h1>
           <p>Interactive 3D Volume &amp; Surface Area</p>
         </div>
       </div>
@@ -298,7 +298,7 @@
 
       <div class="panel">
         <div class="card">
-          <div class="pill" id="pillLabel">Question 1</div>
+          <div class="pill" id="pillLabel">Simulator 1</div>
           <h2 class="question-title" id="questionTitle"></h2>
           <div class="question-text" id="questionText"></div>
 
@@ -344,12 +344,7 @@
       0xff8fab,
       0x51cf66,
       0xffb347,
-      0xa78bfa,
-      0x2dd4bf,
-      0xf87171,
-      0xfacc15,
-      0x60a5fa,
-      0xf472b6
+      0xa78bfa
     ];
 
     function hexToCss(num) {
@@ -371,8 +366,8 @@
     const questions = [
       {
         id: 1,
-        title: "Three cubes are glued together to form the solid below.",
-        text: "All the faces of the solid are painted. The total surface area of the painted faces is 504 cm². Find the volume of one cube.",
+        title: "P6 Worksheet 11A Q9",
+        text: "Three cubes are glued together to form the solid below. All the faces of the solid are painted. The total surface area of the painted faces is 504 cm². Find the volume of one cube.",
         cubes: [
           { x: 0, y: 0, z: 0 },
           { x: 0, y: 0, z: 1 },
@@ -382,56 +377,26 @@
       {
         id: 2,
         title: "Explore a 3 × 1 × 1 prism.",
-        text: "This solid is made of 3 cubes in a straight row. Observe the painted and unpainted faces.",
+        text: "This solid is made of 3 cubes in a straight row.",
         cubes: generateRectangularPrism(3, 1, 1)
       },
       {
         id: 3,
         title: "Investigate a 3 × 2 × 1 cuboid.",
-        text: "How many painted faces are there altogether?",
+        text: "Observe the painted faces.",
         cubes: generateRectangularPrism(3, 2, 1)
       },
       {
         id: 4,
         title: "Investigate a 3 × 2 × 2 cuboid.",
-        text: "Rotate the solid and observe which faces are painted.",
+        text: "Rotate the solid to explore.",
         cubes: generateRectangularPrism(3, 2, 2)
       },
       {
         id: 5,
-        title: "Examine a 3 × 3 × 1 slab.",
-        text: "This is a flat layer. Compare the number of cubes to the number of exposed faces.",
+        title: "Explore a 3 × 3 × 1 slab.",
+        text: "Compare cubes and exposed faces.",
         cubes: generateRectangularPrism(3, 3, 1)
-      },
-      {
-        id: 6,
-        title: "Build understanding with a 4 × 2 × 1 prism.",
-        text: "Which cubes have the greatest number of painted faces?",
-        cubes: generateRectangularPrism(4, 2, 1)
-      },
-      {
-        id: 7,
-        title: "Study a 2 × 2 × 3 cuboid.",
-        text: "How does the number of painted faces change when the solid becomes taller?",
-        cubes: generateRectangularPrism(2, 2, 3)
-      },
-      {
-        id: 8,
-        title: "Investigate a 4 × 2 × 2 cuboid.",
-        text: "Compare corner cubes and edge cubes.",
-        cubes: generateRectangularPrism(4, 2, 2)
-      },
-      {
-        id: 9,
-        title: "Explore a 3 × 3 × 2 cuboid.",
-        text: "Try to find cubes with 3, 2, 1, or 0 painted faces.",
-        cubes: generateRectangularPrism(3, 3, 2)
-      },
-      {
-        id: 10,
-        title: "Challenge: a 3 × 3 × 3 cube.",
-        text: "Can you identify the cubes with no painted faces at all?",
-        cubes: generateRectangularPrism(3, 3, 3)
       }
     ];
 
@@ -646,7 +611,7 @@
       const q = getCurrentQuestion();
       const paintColor = getCurrentPaintColor();
 
-      pillLabel.textContent = `Question ${q.id}`;
+      pillLabel.textContent = `Simulator ${q.id}`;
       questionTitle.textContent = q.title;
       questionText.textContent = q.text;
 

@@ -130,7 +130,7 @@
       font-size:13px;
       color:var(--muted);
       box-shadow:0 8px 20px rgba(15,23,42,0.06);
-      max-width:320px;
+      max-width:360px;
       line-height:1.45;
     }
     .legend{
@@ -293,7 +293,7 @@
         <div class="viewer-wrap">
           <canvas id="scene"></canvas>
           <div class="viewer-note" id="viewerNote">
-            <strong>Drag to rotate.</strong> Scroll to zoom.
+            <strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.
           </div>
         </div>
 
@@ -395,11 +395,13 @@
         id: 2,
         title: "P6 Worksheet 11A",
         textHtml: "Hassan had a rectangular block with a square base as shown. He painted all the faces of the block and then cut it into 1-cm cubes.<br><br>There were 68 cubes with exactly two of their faces painted. Find the volume of the block before it was cut.",
-        type: "square-base-block",
-        dims: { width: 6, height: 9, depth: 6 },
+        type: "small-cubes",
+        cubes: generateRectangularPrism(6, 9, 6),
         showStats: false,
         showControls: false,
-        showLegend: false,
+        showLegend: true,
+        stat1Label: "Total cubes",
+        stat2Label: "Total painted surface",
         note: ""
       },
       {
@@ -642,35 +644,9 @@
       });
     }
 
-    function buildSquareBaseBlock(question) {
-      const { width, height, depth } = question.dims;
-
-      const mainMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(width, height, depth),
-        new THREE.MeshLambertMaterial({
-          color: 0xe6e0d7
-        })
-      );
-      group.add(mainMesh);
-
-      const edges = new THREE.LineSegments(
-        new THREE.EdgesGeometry(new THREE.BoxGeometry(width, height, depth)),
-        new THREE.LineBasicMaterial({ color: 0x8a8175, transparent: true, opacity: 0.8 })
-      );
-      group.add(edges);
-    }
-
     function rebuildScene() {
       clearGroup();
-
-      const q = getCurrentQuestion();
-
-      if (q.type === "square-base-block") {
-        buildSquareBaseBlock(q);
-      } else {
-        buildSmallCubes(q);
-      }
-
+      buildSmallCubes(getCurrentQuestion());
       fitCamera();
     }
 
@@ -695,42 +671,29 @@
       questionTitle.textContent = q.title;
       questionText.innerHTML = q.textHtml;
 
-      if (q.showStats) {
-        statsBox.classList.remove("hide");
-      } else {
-        statsBox.classList.add("hide");
-      }
+      if (q.showStats) statsBox.classList.remove("hide");
+      else statsBox.classList.add("hide");
 
-      if (q.showControls) {
-        controlsBox.classList.remove("hide");
-      } else {
-        controlsBox.classList.add("hide");
-      }
+      if (q.showControls) controlsBox.classList.remove("hide");
+      else controlsBox.classList.add("hide");
 
-      if (q.showLegend) {
-        legendBox.classList.remove("hide");
-      } else {
-        legendBox.classList.add("hide");
-      }
+      if (q.showLegend) legendBox.classList.remove("hide");
+      else legendBox.classList.add("hide");
 
       statLabel1.textContent = q.stat1Label || "Total cubes";
       statLabel2.textContent = q.stat2Label || "Total painted surface";
 
-      totalCubesEl.textContent = isRevealed && q.showStats ? (q.cubes ? q.cubes.length : "?") : "?";
+      totalCubesEl.textContent = isRevealed && q.showStats ? q.cubes.length : "?";
       paintedFacesEl.textContent = isRevealed && q.showStats ? countTotalPaintedFaces(q.cubes) : "?";
 
       prevBtn.disabled = currentQId === 1;
       nextBtn.disabled = currentQId === questions.length;
 
-      if (q.type === "square-base-block") {
-        viewerNote.innerHTML = "<strong>Drag to rotate.</strong> Scroll to zoom.";
-      } else {
-        paintedSwatch.style.background = hexToCss(paintColor);
-        secondSwatch.style.background = "#ffffff";
-        legendLabel1.textContent = "Painted outer surfaces";
-        legendLabel2.textContent = "Inner unpainted surfaces";
-        viewerNote.innerHTML = "<strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.";
-      }
+      paintedSwatch.style.background = hexToCss(paintColor);
+      secondSwatch.style.background = "#ffffff";
+      legendLabel1.textContent = "Painted outer surfaces";
+      legendLabel2.textContent = "Inner unpainted surfaces";
+      viewerNote.innerHTML = "<strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.";
 
       smallNote.textContent = q.note || "";
       buildNav();

@@ -244,6 +244,11 @@
       font-size:14px;
       border-radius:14px;
     }
+    .small-note{
+      min-height:0;
+      margin:0;
+      padding:0;
+    }
     .footer-credit{
       margin-top:14px;
       font-size:12px;
@@ -278,7 +283,7 @@
         <div class="viewer-wrap">
           <canvas id="scene"></canvas>
           <div class="viewer-note">
-            <strong>Drag to rotate.</strong> Scroll to zoom.
+            <strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.
           </div>
         </div>
 
@@ -319,6 +324,8 @@
             <button class="action secondary" id="prevBtn">← Previous</button>
             <button class="action secondary" id="nextBtn">Next →</button>
           </div>
+
+          <div class="small-note"></div>
 
           <div class="footer-credit">Developed for GitHub Pages</div>
         </div>
@@ -449,6 +456,7 @@
 
     let currentQId = 1;
     let isRevealed = false;
+    let detachedIndices = [];
 
     const questionNav = document.getElementById("questionNav");
     const pillLabel = document.getElementById("pillLabel");
@@ -511,6 +519,9 @@
     floor.position.y = -1.11;
     scene.add(floor);
 
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
     function getCurrentQuestion() {
       return questions.find(q => q.id === currentQId);
     }
@@ -533,6 +544,7 @@
     function selectQuestion(id) {
       currentQId = id;
       isRevealed = false;
+      detachedIndices = [];
       rebuildScene();
       updateUI();
     }
@@ -588,14 +600,22 @@
       const centerY = (Math.min(...ys) + Math.max(...ys)) / 2;
       const centerZ = (Math.min(...zs) + Math.max(...zs)) / 2;
 
-      cubes.forEach((c) => {
+      cubes.forEach((c, index) => {
         const mesh = new THREE.Mesh(cubeGeometry, getCubeMaterials(c, cubeSet, paintColor));
 
-        const x = (c.x - centerX) * 1.05;
-        const y = (c.y - centerY) * 1.05;
-        const z = (c.z - centerZ) * 1.05;
+        let x = (c.x - centerX) * 1.05;
+        let y = (c.y - centerY) * 1.05;
+        let z = (c.z - centerZ) * 1.05;
+
+        if (detachedIndices.includes(index)) {
+          const dir = new THREE.Vector3(x || 0.3, y + 0.4, z || 0.3).normalize();
+          x += dir.x * 2.0;
+          y += dir.y * 2.0 + 0.5;
+          z += dir.z * 2.0;
+        }
 
         mesh.position.set(x, y, z);
+        mesh.userData.index = index;
         group.add(mesh);
 
         const edge = new THREE.LineSegments(
@@ -647,6 +667,26 @@
       camera.updateProjectionMatrix();
     }
 
+    function onCanvasClick(event) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const cubeMeshes = group.children.filter(obj => obj.type === "Mesh");
+      const hits = raycaster.intersectObjects(cubeMeshes);
+
+      if (hits.length > 0) {
+        const idx = hits[0].object.userData.index;
+        if (detachedIndices.includes(idx)) {
+          detachedIndices = detachedIndices.filter(i => i !== idx);
+        } else {
+          detachedIndices.push(idx);
+        }
+        rebuildScene();
+      }
+    }
+
     prevBtn.onclick = () => {
       if (currentQId > 1) selectQuestion(currentQId - 1);
     };
@@ -662,9 +702,12 @@
 
     resetBtn.onclick = () => {
       isRevealed = false;
+      detachedIndices = [];
+      rebuildScene();
       updateUI();
     };
 
+    canvas.addEventListener("click", onCanvasClick);
     window.addEventListener("resize", resizeRenderer);
 
     function animate() {

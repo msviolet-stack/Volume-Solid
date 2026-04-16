@@ -172,9 +172,10 @@
       margin-bottom:14px;
     }
     .question-title{
-      margin:0 0 10px;
+      margin:0 0 12px;
       font-size:24px;
-      line-height:1.25;
+      line-height:1.35;
+      font-weight:700;
     }
     .question-text{
       color:var(--muted);
@@ -204,6 +205,10 @@
       font-size:30px;
       font-weight:800;
       color:#0f274d;
+      min-height:38px;
+    }
+    .stat-actions{
+      margin-top:10px;
     }
     .controls{
       display:flex;
@@ -234,10 +239,10 @@
       opacity:.45;
       cursor:not-allowed;
     }
-    .small-note{
-      font-size:13px;
-      line-height:1.6;
-      color:var(--muted);
+    .small-btn{
+      padding:10px 14px;
+      font-size:14px;
+      border-radius:14px;
     }
     .footer-credit{
       margin-top:14px;
@@ -273,7 +278,7 @@
         <div class="viewer-wrap">
           <canvas id="scene"></canvas>
           <div class="viewer-note">
-            <strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.
+            <strong>Drag to rotate.</strong> Scroll to zoom.
           </div>
         </div>
 
@@ -295,30 +300,24 @@
           <div class="stats">
             <div class="stat">
               <div class="stat-label">Total cubes</div>
-              <div class="stat-value" id="totalCubes">0</div>
+              <div class="stat-value" id="totalCubes">?</div>
+              <div class="stat-actions">
+                <button class="action secondary small-btn" id="revealBtn">Reveal</button>
+              </div>
             </div>
+
             <div class="stat">
-              <div class="stat-label">Painted faces</div>
-              <div class="stat-value" id="paintedFaces">0</div>
-            </div>
-            <div class="stat">
-              <div class="stat-label">Detached cubes</div>
-              <div class="stat-value" id="detachedCount">0</div>
-            </div>
-            <div class="stat">
-              <div class="stat-label">Remaining attached</div>
-              <div class="stat-value" id="remainingCount">0</div>
+              <div class="stat-label">Total painted surface</div>
+              <div class="stat-value" id="paintedFaces">?</div>
+              <div class="stat-actions">
+                <button class="action primary small-btn" id="resetBtn">Reset</button>
+              </div>
             </div>
           </div>
 
           <div class="controls">
             <button class="action secondary" id="prevBtn">← Previous</button>
             <button class="action secondary" id="nextBtn">Next →</button>
-            <button class="action primary" id="resetBtn">Reset Detached Cubes</button>
-          </div>
-
-          <div class="small-note">
-            Click cubes to pull them away from the solid so learners can inspect the inside.
           </div>
 
           <div class="footer-credit">Developed for GitHub Pages</div>
@@ -334,16 +333,16 @@
     const INTERNAL_COLOR = 0xffffff;
 
     const QUESTION_PAINT_COLORS = [
-      0x4d96ff, // Q1 blue
-      0xff8fab, // Q2 pink
-      0x51cf66, // Q3 green
-      0xffb347, // Q4 orange
-      0xa78bfa, // Q5 purple
-      0x2dd4bf, // Q6 teal
-      0xf87171, // Q7 coral
-      0xfacc15, // Q8 yellow
-      0x60a5fa, // Q9 sky
-      0xf472b6  // Q10 rose
+      0x4d96ff,
+      0xff8fab,
+      0x51cf66,
+      0xffb347,
+      0xa78bfa,
+      0x2dd4bf,
+      0xf87171,
+      0xfacc15,
+      0x60a5fa,
+      0xf472b6
     ];
 
     function hexToCss(num) {
@@ -367,8 +366,6 @@
         id: 1,
         title: "Three cubes are glued together to form the solid below.",
         text: "All the faces of the solid are painted. The total surface area of the painted faces is 504 cm². Find the volume of one cube.",
-        // L-shape like your picture:
-        // front-left, back-left, back-right
         cubes: [
           { x: 0, y: 0, z: 0 },
           { x: 0, y: 0, z: 1 },
@@ -377,55 +374,55 @@
       },
       {
         id: 2,
-        title: "Explore a 3 × 1 × 1 prism",
+        title: "Explore a 3 × 1 × 1 prism.",
         text: "This solid is made of 3 cubes in a straight row. Observe the painted and unpainted faces.",
         cubes: generateRectangularPrism(3, 1, 1)
       },
       {
         id: 3,
-        title: "Investigate a 3 × 2 × 1 cuboid",
+        title: "Investigate a 3 × 2 × 1 cuboid.",
         text: "How many painted faces are there altogether?",
         cubes: generateRectangularPrism(3, 2, 1)
       },
       {
         id: 4,
-        title: "Investigate a 3 × 2 × 2 cuboid",
-        text: "Detach cubes to see which faces become hidden inside the solid.",
+        title: "Investigate a 3 × 2 × 2 cuboid.",
+        text: "Rotate the solid and observe which faces are painted.",
         cubes: generateRectangularPrism(3, 2, 2)
       },
       {
         id: 5,
-        title: "Examine a 3 × 3 × 1 slab",
+        title: "Examine a 3 × 3 × 1 slab.",
         text: "This is a flat layer. Compare the number of cubes to the number of exposed faces.",
         cubes: generateRectangularPrism(3, 3, 1)
       },
       {
         id: 6,
-        title: "Build understanding with a 4 × 2 × 1 prism",
+        title: "Build understanding with a 4 × 2 × 1 prism.",
         text: "Which cubes have the greatest number of painted faces?",
         cubes: generateRectangularPrism(4, 2, 1)
       },
       {
         id: 7,
-        title: "Study a 2 × 2 × 3 cuboid",
+        title: "Study a 2 × 2 × 3 cuboid.",
         text: "How does the number of painted faces change when the solid becomes taller?",
         cubes: generateRectangularPrism(2, 2, 3)
       },
       {
         id: 8,
-        title: "Investigate a 4 × 2 × 2 cuboid",
-        text: "Detach corner cubes first, then edge cubes, and compare them.",
+        title: "Investigate a 4 × 2 × 2 cuboid.",
+        text: "Compare corner cubes and edge cubes.",
         cubes: generateRectangularPrism(4, 2, 2)
       },
       {
         id: 9,
-        title: "Explore a 3 × 3 × 2 cuboid",
+        title: "Explore a 3 × 3 × 2 cuboid.",
         text: "Try to find cubes with 3, 2, 1, or 0 painted faces.",
         cubes: generateRectangularPrism(3, 3, 2)
       },
       {
         id: 10,
-        title: "Challenge: a 3 × 3 × 3 cube",
+        title: "Challenge: a 3 × 3 × 3 cube.",
         text: "Can you identify the cubes with no painted faces at all?",
         cubes: generateRectangularPrism(3, 3, 3)
       }
@@ -451,7 +448,7 @@
     }
 
     let currentQId = 1;
-    let detachedIndices = [];
+    let isRevealed = false;
 
     const questionNav = document.getElementById("questionNav");
     const pillLabel = document.getElementById("pillLabel");
@@ -459,11 +456,10 @@
     const questionText = document.getElementById("questionText");
     const totalCubesEl = document.getElementById("totalCubes");
     const paintedFacesEl = document.getElementById("paintedFaces");
-    const detachedCountEl = document.getElementById("detachedCount");
-    const remainingCountEl = document.getElementById("remainingCount");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
     const resetBtn = document.getElementById("resetBtn");
+    const revealBtn = document.getElementById("revealBtn");
     const canvas = document.getElementById("scene");
     const paintedSwatch = document.getElementById("paintedSwatch");
 
@@ -515,9 +511,6 @@
     floor.position.y = -1.11;
     scene.add(floor);
 
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-
     function getCurrentQuestion() {
       return questions.find(q => q.id === currentQId);
     }
@@ -539,7 +532,7 @@
 
     function selectQuestion(id) {
       currentQId = id;
-      detachedIndices = [];
+      isRevealed = false;
       rebuildScene();
       updateUI();
     }
@@ -595,22 +588,14 @@
       const centerY = (Math.min(...ys) + Math.max(...ys)) / 2;
       const centerZ = (Math.min(...zs) + Math.max(...zs)) / 2;
 
-      cubes.forEach((c, index) => {
+      cubes.forEach((c) => {
         const mesh = new THREE.Mesh(cubeGeometry, getCubeMaterials(c, cubeSet, paintColor));
 
-        let x = (c.x - centerX) * 1.05;
-        let y = (c.y - centerY) * 1.05;
-        let z = (c.z - centerZ) * 1.05;
-
-        if (detachedIndices.includes(index)) {
-          const dir = new THREE.Vector3(x || 0.3, y + 0.4, z || 0.3).normalize();
-          x += dir.x * 2.0;
-          y += dir.y * 2.0 + 0.5;
-          z += dir.z * 2.0;
-        }
+        const x = (c.x - centerX) * 1.05;
+        const y = (c.y - centerY) * 1.05;
+        const z = (c.z - centerZ) * 1.05;
 
         mesh.position.set(x, y, z);
-        mesh.userData.index = index;
         group.add(mesh);
 
         const edge = new THREE.LineSegments(
@@ -644,10 +629,10 @@
       pillLabel.textContent = `Question ${q.id}`;
       questionTitle.textContent = q.title;
       questionText.textContent = q.text;
-      totalCubesEl.textContent = q.cubes.length;
-      paintedFacesEl.textContent = countTotalPaintedFaces(q.cubes);
-      detachedCountEl.textContent = detachedIndices.length;
-      remainingCountEl.textContent = q.cubes.length - detachedIndices.length;
+
+      totalCubesEl.textContent = isRevealed ? q.cubes.length : "?";
+      paintedFacesEl.textContent = isRevealed ? countTotalPaintedFaces(q.cubes) : "?";
+
       prevBtn.disabled = currentQId === 1;
       nextBtn.disabled = currentQId === questions.length;
       paintedSwatch.style.background = hexToCss(paintColor);
@@ -662,27 +647,6 @@
       camera.updateProjectionMatrix();
     }
 
-    function onCanvasClick(event) {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-      raycaster.setFromCamera(mouse, camera);
-      const cubeMeshes = group.children.filter(obj => obj.type === "Mesh");
-      const hits = raycaster.intersectObjects(cubeMeshes);
-
-      if (hits.length > 0) {
-        const idx = hits[0].object.userData.index;
-        if (detachedIndices.includes(idx)) {
-          detachedIndices = detachedIndices.filter(i => i !== idx);
-        } else {
-          detachedIndices.push(idx);
-        }
-        rebuildScene();
-        updateUI();
-      }
-    }
-
     prevBtn.onclick = () => {
       if (currentQId > 1) selectQuestion(currentQId - 1);
     };
@@ -691,13 +655,16 @@
       if (currentQId < questions.length) selectQuestion(currentQId + 1);
     };
 
-    resetBtn.onclick = () => {
-      detachedIndices = [];
-      rebuildScene();
+    revealBtn.onclick = () => {
+      isRevealed = true;
       updateUI();
     };
 
-    canvas.addEventListener("click", onCanvasClick);
+    resetBtn.onclick = () => {
+      isRevealed = false;
+      updateUI();
+    };
+
     window.addEventListener("resize", resizeRenderer);
 
     function animate() {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>P6 Worksheet 11A Q9</title>
+  <title>P6 Worksheet 11A</title>
   <style>
     :root{
       --bg:#eef3f8;
@@ -505,9 +505,8 @@
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf4f8ff);
-    scene.fog = new THREE.Fog(0xf4f8ff, 30, 120);
 
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 2000);
     camera.position.set(8, 6, 8);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -515,37 +514,37 @@
     controls.dampingFactor = 0.08;
     controls.enablePan = false;
     controls.minDistance = 4;
-    controls.maxDistance = 200;
+    controls.maxDistance = 500;
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.95);
+    const ambient = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambient);
 
-    const light1 = new THREE.DirectionalLight(0xffffff, 0.95);
-    light1.position.set(8, 10, 8);
+    const light1 = new THREE.DirectionalLight(0xffffff, 1);
+    light1.position.set(20, 30, 20);
     scene.add(light1);
 
-    const light2 = new THREE.DirectionalLight(0xffffff, 0.45);
-    light2.position.set(-6, 5, -8);
+    const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+    light2.position.set(-20, 15, -20);
     scene.add(light2);
 
     const group = new THREE.Group();
     scene.add(group);
 
-    const grid = new THREE.GridHelper(200, 40, 0xc7d6ff, 0xdbe6ff);
-    grid.position.y = -1.1;
+    const grid = new THREE.GridHelper(220, 44, 0xc7d6ff, 0xdbe6ff);
+    grid.position.y = -50;
     scene.add(grid);
 
     const floor = new THREE.Mesh(
-      new THREE.PlaneGeometry(220, 220),
+      new THREE.PlaneGeometry(240, 240),
       new THREE.MeshBasicMaterial({
         color: 0xf8fbff,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.85,
         side: THREE.DoubleSide
       })
     );
     floor.rotation.x = -Math.PI / 2;
-    floor.position.y = -1.11;
+    floor.position.y = -50.1;
     scene.add(floor);
 
     const raycaster = new THREE.Raycaster();
@@ -666,32 +665,21 @@
       for (let row = 0; row < height; row++) {
         const color = row < question.bottomRows ? question.bottomColor : question.topColor;
 
-        const mat = new THREE.MeshLambertMaterial({
-          color,
-          transparent: true,
-          opacity: 0.96
-        });
+        const layer = new THREE.Mesh(
+          layerGeometry,
+          new THREE.MeshLambertMaterial({
+            color: color,
+            transparent: false
+          })
+        );
 
-        const layer = new THREE.Mesh(layerGeometry, mat);
         layer.position.set(0, row + 0.5 - centerY, 0);
-        layer.userData.clickable = false;
         group.add(layer);
       }
 
-      const outerBox = new THREE.Mesh(
-        new THREE.BoxGeometry(width, height, depth),
-        new THREE.MeshLambertMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: 0.04
-        })
-      );
-      outerBox.position.set(0, 0, 0);
-      group.add(outerBox);
-
       const edges = new THREE.LineSegments(
         new THREE.EdgesGeometry(new THREE.BoxGeometry(width, height, depth)),
-        new THREE.LineBasicMaterial({ color: 0x6b3652, transparent: true, opacity: 0.55 })
+        new THREE.LineBasicMaterial({ color: 0x8f4c6b, transparent: true, opacity: 0.75 })
       );
       group.add(edges);
     }
@@ -716,9 +704,9 @@
       const center = box.getCenter(new THREE.Vector3());
 
       const maxDim = Math.max(size.x, size.y, size.z, 3);
-      const dist = maxDim * 1.6;
+      const dist = maxDim * 1.8;
 
-      camera.position.set(center.x + dist, center.y + dist * 0.7, center.z + dist);
+      camera.position.set(center.x + dist, center.y + dist * 0.75, center.z + dist);
       controls.target.copy(center);
       controls.update();
     }

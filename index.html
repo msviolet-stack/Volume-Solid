@@ -16,7 +16,6 @@
       --shadow:0 12px 30px rgba(15,23,42,0.08);
       --radius:22px;
     }
-
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -24,7 +23,6 @@
       background:linear-gradient(180deg,#eef3f8 0%,#edf4f2 100%);
       color:var(--text);
     }
-
     header{
       position:sticky;
       top:0;
@@ -33,7 +31,6 @@
       backdrop-filter:blur(8px);
       border-bottom:1px solid var(--border);
     }
-
     .header-inner{
       max-width:1240px;
       margin:0 auto;
@@ -44,13 +41,11 @@
       gap:16px;
       flex-wrap:wrap;
     }
-
     .brand{
       display:flex;
       align-items:center;
       gap:14px;
     }
-
     .brand-icon{
       width:46px;
       height:46px;
@@ -62,25 +57,21 @@
       font-size:22px;
       box-shadow:var(--shadow);
     }
-
     .brand h1{
       margin:0;
       font-size:24px;
       line-height:1.1;
     }
-
     .brand p{
       margin:2px 0 0;
       font-size:13px;
       color:var(--muted);
     }
-
     .question-nav{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
     }
-
     .nav-btn{
       width:38px;
       height:38px;
@@ -91,25 +82,21 @@
       font-weight:700;
       color:var(--text);
     }
-
     .nav-btn.active{
       background:linear-gradient(135deg,var(--primary),var(--primary-dark));
       color:white;
       border-color:transparent;
     }
-
     main{
       max-width:1240px;
       margin:0 auto;
       padding:26px 20px;
     }
-
     .layout{
       display:grid;
       grid-template-columns:3fr 2fr;
       gap:20px;
     }
-
     .panel{
       background:rgba(255,255,255,0.82);
       border:1px solid var(--border);
@@ -117,24 +104,20 @@
       overflow:hidden;
       box-shadow:var(--shadow);
     }
-
     .viewer-wrap{
       position:relative;
       height:580px;
       background:linear-gradient(180deg,#f7fbff 0%,#edf4ff 100%);
     }
-
     #scene{
       width:100%;
       height:100%;
       display:block;
       cursor:grab;
     }
-
     #scene:active{
       cursor:grabbing;
     }
-
     .viewer-note{
       position:absolute;
       top:14px;
@@ -148,24 +131,20 @@
       color:var(--muted);
       box-shadow:0 8px 20px rgba(15,23,42,0.06);
     }
-
     .legend{
       padding:16px 18px 18px;
       border-top:1px solid var(--border);
       background:rgba(255,255,255,0.72);
     }
-
     .legend h3{
       margin:0 0 12px;
       font-size:16px;
     }
-
     .legend-grid{
       display:grid;
       grid-template-columns:repeat(3, minmax(0,1fr));
       gap:12px;
     }
-
     .legend-item{
       display:flex;
       align-items:center;
@@ -173,18 +152,15 @@
       font-size:13px;
       color:var(--muted);
     }
-
     .swatch{
       width:20px;
       height:20px;
       border-radius:7px;
       border:1px solid rgba(0,0,0,0.08);
     }
-
     .card{
       padding:24px;
     }
-
     .pill{
       display:inline-block;
       padding:7px 12px;
@@ -195,13 +171,11 @@
       font-weight:700;
       margin-bottom:14px;
     }
-
     .question-title{
       margin:0 0 10px;
       font-size:24px;
       line-height:1.25;
     }
-
     .question-text{
       color:var(--muted);
       font-size:15px;
@@ -209,33 +183,28 @@
       margin-bottom:18px;
       min-height:48px;
     }
-
     .stats{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
       margin-bottom:20px;
     }
-
     .stat{
       background:#fff;
       border:1px solid var(--border);
       border-radius:18px;
       padding:16px;
     }
-
     .stat-label{
       font-size:13px;
       color:var(--muted);
       margin-bottom:8px;
     }
-
     .stat-value{
       font-size:30px;
       font-weight:800;
       color:#0f274d;
     }
-
     .controls{
       display:flex;
       flex-wrap:wrap;
@@ -243,7 +212,6 @@
       margin-top:8px;
       margin-bottom:14px;
     }
-
     .action{
       border:none;
       border-radius:16px;
@@ -252,49 +220,36 @@
       font-weight:700;
       cursor:pointer;
     }
-
     .secondary{
       background:#fff;
       border:1px solid var(--border);
       color:var(--text);
     }
-
     .primary{
       background:linear-gradient(135deg,var(--primary),var(--primary-dark));
       color:#fff;
       box-shadow:0 10px 20px rgba(47,102,227,0.25);
     }
-
     .action:disabled{
       opacity:.45;
       cursor:not-allowed;
     }
-
     .small-note{
       font-size:13px;
       line-height:1.6;
       color:var(--muted);
     }
-
     .footer-credit{
       margin-top:14px;
       font-size:12px;
       color:#94a3b8;
     }
-
     @media (max-width: 980px){
-      .layout{
-        grid-template-columns:1fr;
-      }
-      .viewer-wrap{
-        height:460px;
-      }
+      .layout{ grid-template-columns:1fr; }
+      .viewer-wrap{ height:460px; }
     }
-
     @media (max-width: 640px){
-      .stats, .legend-grid{
-        grid-template-columns:1fr;
-      }
+      .stats, .legend-grid{ grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -376,8 +331,8 @@
     </div>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <script>
     const FACE_COLORS = {
@@ -412,7 +367,7 @@
       {
         id: 2,
         title: "Explore a 3 × 1 × 1 prism",
-        text: "This one should look like 3 joined cubes, like your sample picture.",
+        text: "This should look like 3 joined cubes, like your sample picture.",
         cubes: generateRectangularPrism(3, 1, 1)
       },
       {
@@ -500,59 +455,56 @@
     const resetBtn = document.getElementById("resetBtn");
     const canvas = document.getElementById("scene");
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true
-    });
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xeef4fb, 18, 40);
+    scene.background = new THREE.Color(0xf4f8ff);
+    scene.fog = new THREE.Fog(0xf4f8ff, 16, 42);
 
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-    camera.position.set(7, 6, 8);
+    camera.position.set(8, 6, 8);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
-    controls.minDistance = 4;
-    controls.maxDistance = 24;
     controls.enablePan = false;
+    controls.minDistance = 4;
+    controls.maxDistance = 28;
 
-    const ambient = new THREE.AmbientLight(0xffffff, 1.2);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.95);
     scene.add(ambient);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    keyLight.position.set(8, 12, 10);
-    scene.add(keyLight);
+    const light1 = new THREE.DirectionalLight(0xffffff, 0.95);
+    light1.position.set(8, 10, 8);
+    scene.add(light1);
 
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.45);
-    fillLight.position.set(-10, 8, -6);
-    scene.add(fillLight);
+    const light2 = new THREE.DirectionalLight(0xffffff, 0.45);
+    light2.position.set(-6, 5, -8);
+    scene.add(light2);
 
     const group = new THREE.Group();
     scene.add(group);
 
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-
-    const grid = new THREE.GridHelper(30, 15, 0xc7d6ff, 0xd8e4ff);
+    const grid = new THREE.GridHelper(30, 15, 0xc7d6ff, 0xdbe6ff);
     grid.position.y = -1.1;
     scene.add(grid);
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(30, 30),
       new THREE.MeshBasicMaterial({
-        color: 0xf7fbff,
+        color: 0xf8fbff,
         transparent: true,
-        opacity: 0.55,
+        opacity: 0.8,
         side: THREE.DoubleSide
       })
     );
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -1.11;
     scene.add(floor);
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
 
     function getCurrentQuestion() {
       return questions.find(q => q.id === currentQId);
@@ -564,7 +516,7 @@
         const btn = document.createElement("button");
         btn.className = "nav-btn" + (q.id === currentQId ? " active" : "");
         btn.textContent = q.id;
-        btn.addEventListener("click", () => selectQuestion(q.id));
+        btn.onclick = () => selectQuestion(q.id);
         questionNav.appendChild(btn);
       });
     }
@@ -597,20 +549,22 @@
     }
 
     function clearGroup() {
-      while (group.children.length) {
+      while (group.children.length > 0) {
         const obj = group.children[0];
         group.remove(obj);
         if (obj.geometry) obj.geometry.dispose();
-        if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
-        else if (obj.material) obj.material.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach(m => m.dispose());
+          else obj.material.dispose();
+        }
       }
     }
 
     function rebuildScene() {
       clearGroup();
 
-      const question = getCurrentQuestion();
-      const cubes = question.cubes;
+      const q = getCurrentQuestion();
+      const cubes = q.cubes;
       const cubeSet = new Set(cubes.map(c => `${c.x},${c.y},${c.z}`));
 
       const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
@@ -625,48 +579,43 @@
       const centerZ = (Math.min(...zs) + Math.max(...zs)) / 2;
 
       cubes.forEach((c, index) => {
-        const materials = getCubeMaterials(c, cubeSet);
-        const mesh = new THREE.Mesh(cubeGeometry, materials);
+        const mesh = new THREE.Mesh(cubeGeometry, getCubeMaterials(c, cubeSet));
 
-        const baseX = (c.x - centerX) * 1.03;
-        const baseY = (c.y - centerY) * 1.03;
-        const baseZ = (c.z - centerZ) * 1.03;
-
-        let px = baseX;
-        let py = baseY;
-        let pz = baseZ;
+        let x = (c.x - centerX) * 1.05;
+        let y = (c.y - centerY) * 1.05;
+        let z = (c.z - centerZ) * 1.05;
 
         if (detachedIndices.includes(index)) {
-          const dir = new THREE.Vector3(baseX || 0.25, baseY + 0.3, baseZ || 0.25).normalize();
-          px += dir.x * 1.8;
-          py += dir.y * 1.8 + 0.5;
-          pz += dir.z * 1.8;
+          const dir = new THREE.Vector3(x || 0.3, y + 0.4, z || 0.3).normalize();
+          x += dir.x * 2.0;
+          y += dir.y * 2.0 + 0.5;
+          z += dir.z * 2.0;
         }
 
-        mesh.position.set(px, py, pz);
+        mesh.position.set(x, y, z);
         mesh.userData.index = index;
         group.add(mesh);
 
-        const edges = new THREE.LineSegments(
+        const edge = new THREE.LineSegments(
           edgeGeometry,
-          new THREE.LineBasicMaterial({ color: 0x304b73, transparent: true, opacity: 0.35 })
+          new THREE.LineBasicMaterial({ color: 0x29466f, transparent: true, opacity: 0.35 })
         );
-        edges.position.copy(mesh.position);
-        group.add(edges);
+        edge.position.copy(mesh.position);
+        group.add(edge);
       });
 
-      fitCameraToGroup();
+      fitCamera();
     }
 
-    function fitCameraToGroup() {
+    function fitCamera() {
       const box = new THREE.Box3().setFromObject(group);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
 
-      const maxDim = Math.max(size.x, size.y, size.z, 2.5);
-      const dist = maxDim * 2.2;
+      const maxDim = Math.max(size.x, size.y, size.z, 3);
+      const dist = maxDim * 2.1;
 
-      camera.position.set(center.x + dist * 0.95, center.y + dist * 0.7, center.z + dist * 0.95);
+      camera.position.set(center.x + dist, center.y + dist * 0.65, center.z + dist);
       controls.target.copy(center);
       controls.update();
     }
@@ -676,24 +625,19 @@
       pillLabel.textContent = `Question ${q.id}`;
       questionTitle.textContent = q.title;
       questionText.textContent = q.text;
-
       totalCubesEl.textContent = q.cubes.length;
       paintedFacesEl.textContent = countTotalPaintedFaces(q.cubes);
       detachedCountEl.textContent = detachedIndices.length;
       remainingCountEl.textContent = q.cubes.length - detachedIndices.length;
-
       prevBtn.disabled = currentQId === 1;
       nextBtn.disabled = currentQId === questions.length;
-
       buildNav();
     }
 
     function resizeRenderer() {
       const rect = canvas.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
-      renderer.setSize(width, height, false);
-      camera.aspect = width / height;
+      renderer.setSize(rect.width, rect.height, false);
+      camera.aspect = rect.width / rect.height;
       camera.updateProjectionMatrix();
     }
 
@@ -703,34 +647,34 @@
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      const meshes = group.children.filter(obj => obj.type === "Mesh");
-      const hits = raycaster.intersectObjects(meshes);
+      const cubeMeshes = group.children.filter(obj => obj.type === "Mesh");
+      const hits = raycaster.intersectObjects(cubeMeshes);
 
       if (hits.length > 0) {
-        const index = hits[0].object.userData.index;
-        if (detachedIndices.includes(index)) {
-          detachedIndices = detachedIndices.filter(i => i !== index);
+        const idx = hits[0].object.userData.index;
+        if (detachedIndices.includes(idx)) {
+          detachedIndices = detachedIndices.filter(i => i !== idx);
         } else {
-          detachedIndices.push(index);
+          detachedIndices.push(idx);
         }
         rebuildScene();
         updateUI();
       }
     }
 
-    prevBtn.addEventListener("click", () => {
+    prevBtn.onclick = () => {
       if (currentQId > 1) selectQuestion(currentQId - 1);
-    });
+    };
 
-    nextBtn.addEventListener("click", () => {
+    nextBtn.onclick = () => {
       if (currentQId < questions.length) selectQuestion(currentQId + 1);
-    });
+    };
 
-    resetBtn.addEventListener("click", () => {
+    resetBtn.onclick = () => {
       detachedIndices = [];
       rebuildScene();
       updateUI();
-    });
+    };
 
     canvas.addEventListener("click", onCanvasClick);
     window.addEventListener("resize", resizeRenderer);

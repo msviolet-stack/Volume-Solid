@@ -346,6 +346,8 @@
           <div class="controls" id="controlsBox">
             <button class="action secondary" id="prevBtn">← Previous</button>
             <button class="action secondary" id="nextBtn">Next →</button>
+            <button class="action secondary hide" id="toggleTopLayerBtn">Hide Top Layer</button>
+            <button class="action secondary hide" id="toggleSecondLayerBtn">Hide 2nd Layer</button>
           </div>
 
           <div class="small-note" id="smallNote"></div>
@@ -448,9 +450,10 @@
       {
         id: 3,
         title: "P6 Worksheet 11 Q1",
-        textHtml: "Rotate the 3D solid to observe its 4 layers. The top 2 layers are made up of 36 small cubes each. The third and fourth layers are made up of 9 bigger cubes each.",
+        textHtml: "The top, bottom and one of the four identical side views of Cube X were as shown.",
         cubes: generateQ3LayeredCubes(),
         isMixedSize: true,
+        allowLayerToggle: true,
         showStats: false,
         showControls: true,
         showLegend: false,
@@ -506,6 +509,8 @@
     let currentQId = 1;
     let isRevealed = false;
     let detachedIndices = [];
+    let q3HideTopLayer = false;
+    let q3HideSecondLayer = false;
 
     const questionNav = document.getElementById("questionNav");
     const pillLabel = document.getElementById("pillLabel");
@@ -517,6 +522,8 @@
     const nextBtn = document.getElementById("nextBtn");
     const resetBtn = document.getElementById("resetBtn");
     const revealBtn = document.getElementById("revealBtn");
+    const toggleTopLayerBtn = document.getElementById("toggleTopLayerBtn");
+    const toggleSecondLayerBtn = document.getElementById("toggleSecondLayerBtn");
     const canvas = document.getElementById("scene");
     const paintedSwatch = document.getElementById("paintedSwatch");
     const secondSwatch = document.getElementById("secondSwatch");
@@ -603,6 +610,8 @@
       currentQId = id;
       isRevealed = false;
       detachedIndices = [];
+      q3HideTopLayer = false;
+      q3HideSecondLayer = false;
       rebuildScene(false);
       updateUI();
     }
@@ -703,7 +712,20 @@
 
     function buildMixedSizeCubes(question) {
       const paintColor = getCurrentPaintColor();
-      const cubes = question.cubes;
+      let cubes = question.cubes;
+
+      if (question.allowLayerToggle) {
+        cubes = cubes.filter(c => {
+          const isTopLayer = c.y === 5;
+          const isSecondLayer = c.y === 4;
+
+          if (q3HideTopLayer && isTopLayer) return false;
+          if (q3HideSecondLayer && isSecondLayer) return false;
+          return true;
+        });
+      }
+
+      if (cubes.length === 0) return;
 
       const minX = Math.min(...cubes.map(c => c.x));
       const minY = Math.min(...cubes.map(c => c.y));
@@ -802,6 +824,16 @@
         viewerNote.innerHTML = "<strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.";
       }
 
+      if (q.allowLayerToggle) {
+        toggleTopLayerBtn.classList.remove("hide");
+        toggleSecondLayerBtn.classList.remove("hide");
+        toggleTopLayerBtn.textContent = q3HideTopLayer ? "Show Top Layer" : "Hide Top Layer";
+        toggleSecondLayerBtn.textContent = q3HideSecondLayer ? "Show 2nd Layer" : "Hide 2nd Layer";
+      } else {
+        toggleTopLayerBtn.classList.add("hide");
+        toggleSecondLayerBtn.classList.add("hide");
+      }
+
       smallNote.textContent = q.note || "";
       buildNav();
     }
@@ -845,6 +877,18 @@
       if (currentQId < questions.length) selectQuestion(currentQId + 1);
     };
 
+    toggleTopLayerBtn.onclick = () => {
+      q3HideTopLayer = !q3HideTopLayer;
+      rebuildScene(true);
+      updateUI();
+    };
+
+    toggleSecondLayerBtn.onclick = () => {
+      q3HideSecondLayer = !q3HideSecondLayer;
+      rebuildScene(true);
+      updateUI();
+    };
+
     revealBtn.onclick = () => {
       isRevealed = true;
       updateUI();
@@ -853,6 +897,8 @@
     resetBtn.onclick = () => {
       isRevealed = false;
       detachedIndices = [];
+      q3HideTopLayer = false;
+      q3HideSecondLayer = false;
       rebuildScene(false);
       updateUI();
     };

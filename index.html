@@ -386,6 +386,36 @@
       return cubes;
     }
 
+    function generateQ3LayeredCubes() {
+      const cubes = [];
+
+      for (let z = 0; z < 3; z++) {
+        for (let x = 0; x < 3; x++) {
+          cubes.push({ x: x * 2, y: 0, z: z * 2, size: 2 });
+        }
+      }
+
+      for (let z = 0; z < 3; z++) {
+        for (let x = 0; x < 3; x++) {
+          cubes.push({ x: x * 2, y: 2, z: z * 2, size: 2 });
+        }
+      }
+
+      for (let z = 0; z < 6; z++) {
+        for (let x = 0; x < 6; x++) {
+          cubes.push({ x, y: 4, z, size: 1 });
+        }
+      }
+
+      for (let z = 0; z < 6; z++) {
+        for (let x = 0; x < 6; x++) {
+          cubes.push({ x, y: 5, z, size: 1 });
+        }
+      }
+
+      return cubes;
+    }
+
     const questions = [
       {
         id: 1,
@@ -417,12 +447,13 @@
       },
       {
         id: 3,
-        title: "Explore a 3 × 2 × 1 cuboid.",
-        textHtml: "Observe the painted faces.",
-        cubes: generateRectangularPrism(3, 2, 1),
-        showStats: true,
+        title: "P6 Worksheet 11 Q1",
+        textHtml: "Rotate the 3D solid to observe its 4 layers. The top 2 layers are made up of 36 small cubes each. The third and fourth layers are made up of 9 bigger cubes each.",
+        cubes: generateQ3LayeredCubes(),
+        isMixedSize: true,
+        showStats: false,
         showControls: true,
-        showLegend: true,
+        showLegend: false,
         stat1Label: "Total cubes",
         stat2Label: "Total painted surface",
         note: ""
@@ -670,9 +701,59 @@
       });
     }
 
+    function buildMixedSizeCubes(question) {
+      const paintColor = getCurrentPaintColor();
+      const cubes = question.cubes;
+
+      const minX = Math.min(...cubes.map(c => c.x));
+      const minY = Math.min(...cubes.map(c => c.y));
+      const minZ = Math.min(...cubes.map(c => c.z));
+      const maxX = Math.max(...cubes.map(c => c.x + c.size));
+      const maxY = Math.max(...cubes.map(c => c.y + c.size));
+      const maxZ = Math.max(...cubes.map(c => c.z + c.size));
+
+      const centerX = (minX + maxX) / 2;
+      const centerY = (minY + maxY) / 2;
+      const centerZ = (minZ + maxZ) / 2;
+
+      cubes.forEach((c) => {
+        const size = c.size || 1;
+
+        const geometry = new THREE.BoxGeometry(size, size, size);
+        const material = new THREE.MeshLambertMaterial({ color: paintColor });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        const edge = new THREE.LineSegments(
+          new THREE.EdgesGeometry(geometry),
+          new THREE.LineBasicMaterial({
+            color: 0x29466f,
+            transparent: true,
+            opacity: 0.45
+          })
+        );
+
+        const posX = (c.x + size / 2 - centerX) * 1.02;
+        const posY = (c.y + size / 2 - centerY) * 1.02;
+        const posZ = (c.z + size / 2 - centerZ) * 1.02;
+
+        mesh.position.set(posX, posY, posZ);
+        edge.position.copy(mesh.position);
+
+        group.add(mesh);
+        group.add(edge);
+      });
+    }
+
     function rebuildScene(preserveView = true) {
       clearGroup();
-      buildSmallCubes(getCurrentQuestion());
+
+      const q = getCurrentQuestion();
+      if (q.isMixedSize) {
+        buildMixedSizeCubes(q);
+      } else {
+        buildSmallCubes(q);
+      }
+
       if (!preserveView) fitCamera();
     }
 
@@ -714,7 +795,12 @@
       secondSwatch.style.background = "#ffffff";
       legendLabel1.textContent = "Painted outer surfaces";
       legendLabel2.textContent = "Inner unpainted surfaces";
-      viewerNote.innerHTML = "<strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.";
+
+      if (q.isMixedSize) {
+        viewerNote.innerHTML = "<strong>Drag to rotate.</strong> Scroll to zoom.";
+      } else {
+        viewerNote.innerHTML = "<strong>Drag to rotate.</strong> Scroll to zoom. Click a cube to detach / reattach.";
+      }
 
       smallNote.textContent = q.note || "";
       buildNav();
@@ -729,6 +815,8 @@
 
     function onCanvasClick(event) {
       const q = getCurrentQuestion();
+
+      if (q.isMixedSize) return;
 
       const rect = canvas.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
